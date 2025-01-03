@@ -1,7 +1,12 @@
 import React from "react";
+import { Text, View } from "react-native";
 
 const AddTransactionScreen = () => {
-  return <div>AddTransactionScreen</div>;
+  return (
+    <View>
+      <Text>AddTransactionScreen</Text>
+    </View>
+  );
 };
 
 export default AddTransactionScreen;
