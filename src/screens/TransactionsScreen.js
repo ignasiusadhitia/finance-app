@@ -1,16 +1,16 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import Storage from "../services/storage";
 
 const TransactionsScreen = () => {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     const loadTransactions = async () => {
-      const storedTransactions =
-        JSON.parse(await AsyncStorage.getItem("transactions")) || [];
+      const storedTransactions = (await Storage.get("transactions")) || [];
       setTransactions(storedTransactions);
     };
+
     loadTransactions();
   }, []);
 
