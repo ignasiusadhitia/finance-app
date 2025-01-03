@@ -25,7 +25,7 @@ const Storage = {
       const jsonValue = await AsyncStorage.getItem(key);
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (error) {
-      console.error("Failed to retrieve data from AsyncStorage", e);
+      console.error("Failed to retrieve data from AsyncStorage", error);
       return null;
     }
   },
