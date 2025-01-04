@@ -45,7 +45,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Button
-        title="Transaction Form"
+        title="Add Transaction"
         onPress={() => navigation.navigate("Transaction Form")}
       />
       <Button
