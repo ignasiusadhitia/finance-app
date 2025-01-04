@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
 import Storage from "../services/storage";
 
-const AddTransactionScreen = ({ navigation }) => {
+const TransactionFormScreen = ({ navigation }) => {
   const [type, setType] = useState("income");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -87,4 +87,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddTransactionScreen;
+export default TransactionFormScreen;
