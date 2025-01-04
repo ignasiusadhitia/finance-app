@@ -12,7 +12,7 @@ const AppNavigator = () => (
     <Stack.Navigator initialRouteName="Home">
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Transactions" component={TransactionsScreen} />
-      <Stack.Screen name="AddTransaction" component={AddTransactionScreen} />
+      <Stack.Screen name="Add Transaction" component={AddTransactionScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

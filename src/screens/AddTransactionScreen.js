@@ -24,7 +24,7 @@ const AddTransactionScreen = ({ navigation }) => {
     try {
       const existingTransactions = (await Storage.get("transactions")) || [];
       const updatedTransactions = [...existingTransactions, newTransaction];
-      await Storage.set("transactions", updatedTransactions);
+      await Storage.save("transactions", updatedTransactions);
       Alert.alert("Success", "Transaction added successfully");
       navigation.goBack();
     } catch (error) {
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   label: { fontSize: 16, marginBottom: 8 },
   typeSwitch: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     marginBottom: 16,
   },
