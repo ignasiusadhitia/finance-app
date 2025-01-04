@@ -34,6 +34,10 @@ const TransactionsScreen = ({ navigation }) => {
     loadTransactions();
   }, []);
 
+  useEffect(() => {
+    applyFilters();
+  }, [filterType, filterDate]);
+
   // Filter transactions
   const applyFilters = () => {
     let filtered = transactions;
@@ -57,11 +61,20 @@ const TransactionsScreen = ({ navigation }) => {
     setFilteredTransactions(transactions);
   };
 
+  // Open Date Picker
+  const handleOpenDatePicker = () => {
+    setDatePickerVisible(true);
+  };
+
   // Confirm Date
   const handleConfirmDate = (date) => {
     setFilterDate(date);
-    setShowDatePicker(false);
-    applyFilters();
+    setDatePickerVisible(false);
+  };
+
+  // Cancel Date Picker
+  const handleCancelDatePicker = () => {
+    setDatePickerVisible(false);
   };
 
   // Delete transactions
@@ -143,7 +156,6 @@ const TransactionsScreen = ({ navigation }) => {
           color={filterType === "income" ? "green" : "gray"}
           onPress={() => {
             setFilterType(filterType === "income" ? "" : "income");
-            applyFilters();
           }}
         />
         <Button
@@ -151,12 +163,11 @@ const TransactionsScreen = ({ navigation }) => {
           color={filterType === "expense" ? "red" : "gray"}
           onPress={() => {
             setFilterType(filterType === "expense" ? "" : "expense");
-            applyFilters();
           }}
         />
         <TouchableOpacity
           style={styles.dateFilter}
-          onPress={() => setDatePickerVisible(true)}
+          onPress={handleOpenDatePicker}
         >
           <Text style={styles.dateFilterText}>
             {filterDate ? filterDate.toLocaleDateString() : "Pick Date"}
@@ -166,28 +177,34 @@ const TransactionsScreen = ({ navigation }) => {
       </View>
 
       {/* Date Picker */}
-
       <DateTimePicker
         isVisible={isDatePickerVisible}
         mode="date"
         onConfirm={handleConfirmDate}
-        onCancel={() => setDatePickerVisible(false)}
+        onCancel={handleCancelDatePicker}
       />
 
       {/* Transactions List */}
-      <FlatList
-        data={filteredTransactions}
-        renderItem={renderTransaction}
-        keyExtractor={(item, index) => index.toString()}
-      />
+      {filteredTransactions.length > 0 ? (
+        <FlatList
+          data={filteredTransactions}
+          renderItem={renderTransaction}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      ) : (
+        <Text>No transactions found.</Text>
+      )}
 
       {/* Delete All Button */}
-      <TouchableOpacity
-        onPress={() => openDeleteModal(null, true)}
-        style={[styles.button, styles.deleteAllButton]}
-      >
-        <Text style={styles.buttonText}>Delete All Transactions</Text>
-      </TouchableOpacity>
+
+      {filteredTransactions.length > 0 && (
+        <TouchableOpacity
+          onPress={() => openDeleteModal(null, true)}
+          style={[styles.button, styles.deleteAllButton]}
+        >
+          <Text style={styles.buttonText}>Delete All Transactions</Text>
+        </TouchableOpacity>
+      )}
 
       {/* Delete Confirmation Modal */}
       <Modal
