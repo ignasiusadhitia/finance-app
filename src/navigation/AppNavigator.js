@@ -12,7 +12,15 @@ const AppNavigator = () => (
     <Stack.Navigator initialRouteName="Home">
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Transactions" component={TransactionsScreen} />
-      <Stack.Screen name="Transaction Form" component={TransactionFormScreen} />
+      <Stack.Screen
+        name="Transaction Form"
+        component={TransactionFormScreen}
+        options={({ route }) => ({
+          title: route.params?.transaction
+            ? "Edit Transaction"
+            : "New Transaction",
+        })}
+      />
     </Stack.Navigator>
   </NavigationContainer>
 );

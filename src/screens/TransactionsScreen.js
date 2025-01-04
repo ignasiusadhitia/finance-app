@@ -12,7 +12,7 @@ import {
 import Storage from "../services/storage";
 import DateTimePicker from "react-native-modal-datetime-picker";
 
-const TransactionsScreen = ({ navigation }) => {
+const TransactionsScreen = ({ navigation, route }) => {
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [filterType, setFilterType] = useState("");

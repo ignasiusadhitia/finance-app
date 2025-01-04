@@ -1,11 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
 import Storage from "../services/storage";
 
-const TransactionFormScreen = ({ navigation }) => {
+const TransactionFormScreen = ({ navigation, route }) => {
   const [type, setType] = useState("income");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
+  const [transactionIndex, setTransactionIndex] = useState(null);
+
+  useEffect(() => {
+    if (route.params?.transaction) {
+      const { transaction, index } = route.params;
+      setType(transaction.type);
+      setAmount(transaction.amount.toString());
+      setDescription(transaction.description || "");
+      setTransactionIndex(index);
+      setIsEdit(true);
+    }
+  }, [route.params]);
 
   const handleSave = async () => {
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
@@ -13,22 +26,32 @@ const TransactionFormScreen = ({ navigation }) => {
       return;
     }
 
-    const newTransaction = {
-      id: Date.now(),
+    const transaction = {
+      id: isEdit ? route.params.transaction.id : Date.now(),
       type,
       amount: parseFloat(amount),
       description,
-      date: new Date().toLocaleDateString(),
+      date: isEdit
+        ? route.params.transaction.date
+        : new Date().toLocaleDateString(),
     };
 
     try {
       const existingTransactions = (await Storage.get("transactions")) || [];
-      const updatedTransactions = [...existingTransactions, newTransaction];
-      await Storage.save("transactions", updatedTransactions);
-      Alert.alert("Success", "Transaction added successfully");
-      navigation.goBack();
+      if (isEdit) {
+        existingTransactions[transactionIndex] = transaction;
+      } else {
+        existingTransactions.push(transaction);
+      }
+
+      await Storage.save("transactions", existingTransactions);
+      Alert.alert(
+        "Success",
+        isEdit ? "Transaction updated" : "Transaction added"
+      );
+      navigation.navigate("Transactions");
     } catch (error) {
-      Alert.alert("Error", "Failed to add transaction");
+      Alert.alert("Error", "Failed to save transaction");
     }
   };
 
@@ -64,7 +87,11 @@ const TransactionFormScreen = ({ navigation }) => {
           onChangeText={setDescription}
         />
 
-        <Button title="Save Transaction" onPress={handleSave} color="blue" />
+        <Button
+          title={isEdit ? "Update Transaction" : "Save Transaction"}
+          onPress={handleSave}
+          color="blue"
+        />
       </View>
     </View>
   );
