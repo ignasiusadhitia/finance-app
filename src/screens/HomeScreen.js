@@ -70,7 +70,7 @@ const HomeScreen = ({ navigation }) => {
           absolute
         />
       ) : (
-        <Text>Loading chart...</Text>
+        <Text>No transactions found.</Text>
       )}
     </View>
   );
