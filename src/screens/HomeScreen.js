@@ -67,7 +67,6 @@ const HomeScreen = ({ navigation }) => {
           }}
           accessor={"population"}
           backgroundColor={"transparent"}
-          padding={"16"}
           absolute
         />
       ) : (
