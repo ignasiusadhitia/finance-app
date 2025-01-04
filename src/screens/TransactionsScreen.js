@@ -10,22 +10,59 @@ import {
   View,
 } from "react-native";
 import Storage from "../services/storage";
+import DateTimePicker from "react-native-modal-datetime-picker";
 
 const TransactionsScreen = ({ navigation }) => {
   const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [filterType, setFilterType] = useState("");
+  const [filterDate, setFilterDate] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [modalVisible, setModalvisible] = useState(false);
   const [selectedTransactionIndex, setSelectedTransactionIndex] =
     useState(null);
   const [deleteAll, setDeleteAll] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
 
   useEffect(() => {
     const loadTransactions = async () => {
       const storedTransactions = (await Storage.get("transactions")) || [];
       setTransactions(storedTransactions);
+      setFilteredTransactions(storedTransactions);
     };
 
     loadTransactions();
   }, []);
+
+  // Filter transactions
+  const applyFilters = () => {
+    let filtered = transactions;
+
+    if (filterType) {
+      filtered = filtered.filter((item) => item.type === filterType);
+    }
+
+    if (filterDate) {
+      const formattedFilterDate = new Date(filterDate).toLocaleDateString();
+      filtered = filtered.filter((item) => item.date === formattedFilterDate);
+    }
+
+    setFilteredTransactions(filtered);
+  };
+
+  // Clear Filters
+  const clearFilters = () => {
+    setFilterType("");
+    setFilterDate(null);
+    setFilteredTransactions(transactions);
+  };
+
+  // Confirm Date
+  const handleConfirmDate = (date) => {
+    setFilterDate(date);
+    setShowDatePicker(false);
+    applyFilters();
+  };
 
   // Delete transactions
   const handleDeleteTransaction = async () => {
@@ -34,6 +71,7 @@ const TransactionsScreen = ({ navigation }) => {
       try {
         await Storage.remove("transactions");
         setTransactions([]);
+        setFilteredTransactions([]);
         setModalvisible(false);
         Alert.alert("Success", "All transactions deleted successfully");
       } catch (error) {
@@ -46,6 +84,7 @@ const TransactionsScreen = ({ navigation }) => {
         );
         await Storage.save("transactions", updatedTransactions);
         setTransactions(updatedTransactions);
+        setFilteredTransactions(updatedTransactions);
         setModalvisible(false);
         Alert.alert("Success", "Transaction deleted successfully");
       } catch (error) {
@@ -97,9 +136,47 @@ const TransactionsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Filter Controls */}
+      <View style={styles.filters}>
+        <Button
+          title="Income"
+          color={filterType === "income" ? "green" : "gray"}
+          onPress={() => {
+            setFilterType(filterType === "income" ? "" : "income");
+            applyFilters();
+          }}
+        />
+        <Button
+          title="Expense"
+          color={filterType === "expense" ? "red" : "gray"}
+          onPress={() => {
+            setFilterType(filterType === "expense" ? "" : "expense");
+            applyFilters();
+          }}
+        />
+        <TouchableOpacity
+          style={styles.dateFilter}
+          onPress={() => setDatePickerVisible(true)}
+        >
+          <Text style={styles.dateFilterText}>
+            {filterDate ? filterDate.toLocaleDateString() : "Pick Date"}
+          </Text>
+        </TouchableOpacity>
+        <Button title="Clear Filters" onPress={clearFilters} color="orange" />
+      </View>
+
+      {/* Date Picker */}
+
+      <DateTimePicker
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirmDate}
+        onCancel={() => setDatePickerVisible(false)}
+      />
+
       {/* Transactions List */}
       <FlatList
-        data={transactions}
+        data={filteredTransactions}
         renderItem={renderTransaction}
         keyExtractor={(item, index) => index.toString()}
       />
@@ -154,6 +231,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     marginTop: 10,
+  },
+  filters: {
+    flexDirection: "column",
+    justifyContent: "space-around",
+    marginTop: 16,
+  },
+  dateFilter: {
+    padding: 10,
+    backgroundColor: "#007bff",
+    borderRadius: 5,
+  },
+  dateFilterText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
   button: {
     padding: 8,
